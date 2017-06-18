@@ -8,7 +8,7 @@ typora-copy-images-to: img
 
 每一个ContentProvider组件都是通过一个URI来访问的。每一个URI所访问的资源都具有一种特定的数据类型，这些数据类型使用多功能Internet邮件扩展协议（MIME）来描述。MIME的定义形式为“[type]/[subtype]”，其中，[type]用来描述数据类型的大类，而[subtype]用来描述数据类型的子类。例如，"text/html"描述的数据类型的大类是文本（text），而子类是超文本标记语言（html）
 
-![1497771316197](img/1497771316197.png)
+![uri](img/uri.png)
 
 - A组件是一个协议名称，它的值固定为`content://` , 是ContentProvider组件的专用访问协议
 - B组件是一个ContentProvider的android:authority属性值

@@ -190,7 +190,7 @@ Android系统提供了一种描述语言来定义具有跨进程访问能力的�
 
 ![](img/aidl.png)
 
-![1497683865587](img/1497683865587.png)
+![IInterface](img/IInterface.png)
 
 ### RemoteCallbackList
 
@@ -369,6 +369,8 @@ ServiceManager
 
 作用是将字符形式的Binder名字转化成Client中对该Binder的引用，使得Client能够通过Binder名字获得对Server中Binder实体的引用。注册了名字的Binder叫实名Binder，就象每个网站除了有IP地址外还有自己的网址。
 
+![](img/servicemanager.png)
+
 ![](img/binder1.png)
 
 ![](http://images2015.cnblogs.com/blog/13430/201705/13430-20170516223325025-1448613892.png)
@@ -391,6 +393,8 @@ ActivityManagerService、PackageManagerService、WindowManagerService、ContentS
 ## Binder对象引用计数技术
 
 ![](img/引用计数.png)
+
+![](img/引用计数2.png)
 
 ## PackageManagerService
 
