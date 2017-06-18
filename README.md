@@ -14,7 +14,7 @@ Android应用程序框架篇包含十个章节的内容。我们知道，在移�
 
 本书从初学者的角度出发，结合具体的使用情景，在纵向和横向上对Android系统的源代码进行了全面、深入、细致的分析。在纵向上，采用从下到上的方式，分析的源代码涉及了Android系统的内核层（Linux Kernel）、硬件抽象层（HAL）、运行时库层（Runtime）、应用程序框架层（Application Framework）以及应用程序层（Application），这有利于读者从整体上掌握Android系统的架构。在横向上，从Android应用程序的组件、进程、消息以及安装四个角度出发，全面地剖析了Android系统的应用程序框架层，这有利于读者深入地理解Android应用程序的架构以及运行原理。
 
-### [《Android系统源代码情景分析》一书勘误](http://blog.csdn.net/luoshengyang/article/details/8116866)
+[《Android系统源代码情景分析》一书勘误](http://blog.csdn.net/luoshengyang/article/details/8116866)
 
 ### 目录
 

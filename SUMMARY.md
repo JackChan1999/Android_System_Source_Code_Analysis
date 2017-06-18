@@ -1,6 +1,8 @@
 # Summary
 
 * [前言](README.md)
+* [源码开发](源码开发/手把手教你android源码开发一.md)
+* [IPC机制](底层知识/IPC机制.md)
 * [Android底层知识](底层知识/README.md)
   * [Android底层知识1](底层知识/Android底层知识1.md)
   * [Android底层知识2](底层知识/Android底层知识2.md)
@@ -10,6 +12,7 @@
   * [Android底层知识6](底层知识/Android底层知识6.md)
   * [Android底层知识7](底层知识/Android底层知识7.md)
   * [Android底层知识8](底层知识/Android底层知识8.md)
+* [第3章 智能指针](chapter3/README.md)
 * [第5章 Binder进程间通信系统](chapter5/README.md)
   * [Binder学习指南](chapter5/Binder学习指南.md)
   * [Android Bander设计与实现 - 设计篇](chapter5/Android Bander设计与实现 - 设计篇.md)
