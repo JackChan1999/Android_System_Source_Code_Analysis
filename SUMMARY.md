@@ -3,6 +3,7 @@
 * [前言](README.md)
 * [源码开发](源码开发/手把手教你android源码开发一.md)
 * [IPC机制](底层知识/IPC机制.md)
+* [Ashmem匿名共享内存系统](底层知识/Ashmem匿名共享内存系统.md)
 * [Android底层知识](底层知识/README.md)
   * [Android底层知识1](底层知识/Android底层知识1.md)
   * [Android底层知识2](底层知识/Android底层知识2.md)
