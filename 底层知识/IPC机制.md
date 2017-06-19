@@ -335,7 +335,19 @@ public class BindingActivity extends Activity {
 
 ### APPWidgetProvider
 
-## Binder的组成解构
+## Binder的组成结构
+
+Binder进程间通信机制的每一个Server进程和Client进程都维护一个Binder线程池来处理进程间的通信请求，因此，Server进程和Client进程可以并发的提供和访问服务。Server进程和Client进程的通信要依靠运行在内核空间的Binder驱动程序来进行。Binder驱动程序向用户空间暴露了一个设备文件/dev/binder，使得应用程序进程可以间接的通过它建立通信通道。Service组件在启动时，会将自己注册到ServiceManager组件中，以便Client组件可以通过ServiceManager组件找到它。因此，我们将ServiceManager组件称为Binder进程间通信机制的上下文管理者，同时由于它也需要与普通的Service进程和Client进程通信，我们也将它看做是一个Service组件，只不过它是一个特殊的Service组件。
+
+Binder驱动程序在内核空间
+
+### 内核缓冲区管理
+
+开始的时候，Binder驱动程序只为进程分配了一个页面的物理内存，后面会随着进程的需要分配更多的物理内存，但是最多可以分配4M内存，这是一种按需分配的策略。物理内存的分配是以页面为单位分配的，但是进程一次使用的内存却不是以页面为单位的，因此，Binder驱动程序为进程维护了一个内核缓冲区池，内核缓冲区池中的每一块内存都是用一个binder_buffer结构体来描述，并且保存在一个列表中。
+
+### Binder进程间通信库
+
+Android系统在应用程序框架层中将各种Binder驱动程序操作封装成一个Binder库，这样进程就可以方便的调用Binder库提供的接口来实现进程间通信。
 
 应用程序框架中的基于Java语言的Binder接口是通过JNI来调用基于C/C++语言的Binder运行库来为Java应用程序提供进程间通信服务的。JNI在Android系统中用得相当普遍，SDK中的Java接口API很多只是简单地通过JNI来调用底层的C/C++运行库从而为应用程序服务的。
 
@@ -392,9 +404,66 @@ ActivityManagerService、PackageManagerService、WindowManagerService、ContentS
 
 ## Binder对象引用计数技术
 
+在Client进程和Server进程的一次通信过程中，设计了四种类型的对象，分别是位于Binder驱动程序中的Binder实体对象和Binder引用对象，以及位于Binder库中的Binder本地对象和Binder代理对象。它们的交互过程如图所示
+
 ![](img/引用计数.png)
 
 ![](img/引用计数2.png)
+
+它们的交互过程可以划分为5个步骤
+
+- 运行在Client进程的Binder代理对象通过Binder驱动程序向运行在Server进程中的Binder本地对象发出一个进程间通信请求，Binder驱动程序接着就根据Client进程传递过来的Binder代理对象的句柄值找到对应的引用对象
+- Binder驱动程序根据前面找到的Binder引用对象找到对应的Binder实体对象，并且创建一个事务binder_transaction来描述该次进程间通信过程
+- Binder驱动程序根据前面找到的Binder实体对象找到运行在Server进程中的Binder本地对象，并且将Client进程传递过来的通信数据交给它处理
+- Binder本地对象处理完Client进程的通信请求之后，就将通信结果返回给Binder驱动程序，Binder驱动程序接着就找到前面创建的一个事务
+- Binder驱动程序根据前面找到的事务的相关属性来找到发出通信请求的Client进程，并且通知Client进程将通信结果返回给对应的Binder代理对象处理
+
+从这个过程可以看出，Binder代理对象依赖于Binder引用对象，而Binder引用对象又依赖于Binder实体对象，最后，Binder实体对象又依赖于Binder本地对象。这样，Binder进程间通信机制就必须采用一种技术措施来保证，不能销毁一个还被其他对象还依赖着的对象。为了维护这些依赖关系，Binder进程间通信机制采用引用计数技术来维护每一个Binder的生命周期。
+
+### Binder本地对象的生命周期
+
+## Binder对象死亡通知机制
+
+## ServiceManager的启动过程
+
+ServiceManager是Binder进程间通信机制的核心组件之一，它扮演者Binder进程间通信机制上下文的管理者，同时负责管理系统中的Service组件，并且向Client进程提供获取Service代理对象的服务。
+
+ServiceManager运行在一个独立的进程中，因此，Service组件和Client组件也需要通过进程间通信机制来和它交互，而采用的进程间通信机制也正好是Binder进程间通信机制。从这个角度来看，ServieManager除了是Binder进程间通信机制上下文的管理者之外，它也是一个特殊的Service组件。
+
+ServiceManager是由init进程负责启动的，而init进程是在系统启动时启动的，因此，ServiceManager也是在系统启动时启动的。
+
+### 注册为Binder上下文管理者
+
+### ServiceManager代理对象的获取过程
+
+Service组件在启动时，需要将自己注册到ServiceManager中；而Client组件在使用Service组件提供的服务前，也需要通过ServiceManager来获取Service组件的代理对象。由于ServiceManager也是一个Service组件，因此，其他的Service组件和Client组件在使用它提供的服务之前，也需要先获得它的代理对象。作为一个特殊的Service组件，ServiceManager代理对象的获取过程与其它的Service代理对象的获取过程有所不同。
+
+### Service组件的启动过程
+
+Service组件是在Server进程中运行的。Service进程在启动时，会首先将它里面的Service组件注册到ServiceManager中，接着再启动一个Binder线程池来等待和处理Client进程的通信请求。
+
+### Service代理对象的获取过程
+
+Service组件将自己注册到ServiceManager中之后，它就在Server进程中等待Client进程将进程间通信请求发送过来。Client进程为了和运行在Server进程中的Service组件通信，首先要获得它的一个代理对象，这是通过ServiceManager提供的Service组件查询服务来实现的。
+
+ServiceManager代理对象的成员函数getService提供了获取一个Service组件的代理对象的功能。
+
+## Binder进程间通信的Java接口
+
+Java代码可以通过JNI方法来调用C/C++代码，因此，在Android系统在应用程序框架层中提供了Binder进程间通信机制的Java接口，它们通过JNI方法来调用Binder库的C/C++接口，从而提供了执行Binder进程间通信的能力。
+
+### ServiceManager的Java代理对象的获取过程
+
+![](img/ServiceManager代理对象.png)
+
+- getService()获取Java服务的代理对象
+- checkService()获取Java服务的代理对象
+- addService()注册Java服务
+- listService()获取注册在ServiceManager中的Java服务名称列表
+
+ServiceManager的java代理对象的内部有一个成员变量mRemote，它的类型为IBinder，实际上指向的是BinderProxy对象。BinderProxy类内部有一个类型为int的成员变量mObject，它指向C++层中的一个Binder代理对象。这样，我们就可以将一个Java服务代理对象和C++层的Binder代理对象关联起来，即可以通过C++层中的Binder代理对象来实现Java服务代理对象的功能。
+
+![](img/ServiceManager类关系图.png)
 
 ## PackageManagerService
 
@@ -450,13 +519,5 @@ ActivityManagerService、PackageManagerService、WindowManagerService、ContentS
 
 - execStartActivity()
 - newActivity()
-
-## Zygote进程和System进程的启动过程
-
-Zygote进程孵化器，加载内核 --> 启动init进程 --> 启动Zygote进程（socket），复制自身的方式创建进程
-
-System进程：运行系统关键服务，在ServerThread中通过各种service的main()方法把服务启动起来，并通过ServiceManager.addService()把服务注册到ServiceManager中
-
-![1497708968889](img/1497708968889.png)
 
 ## Binder线程池
