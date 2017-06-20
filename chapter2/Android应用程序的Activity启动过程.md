@@ -1,0 +1,280 @@
+在[Android](http://lib.csdn.net/base/android)系统中，Activity和Service是应用程序的核心组件，它们以松藕合的方式组合在一起构成了一个完整的应用程序，这得益于应用程序框架层提供了一套完整的机制来协助应用程序启动这些Activity和Service，以及提供Binder机制帮助它们相互间进行通信。在前面的文章[Android进程间通信（IPC）机制Binder简要介绍和学习计划](http://blog.csdn.net/luoshengyang/article/details/6618363)和[Android系统在新进程中启动自定义服务过程（startService）的原理分析](http://blog.csdn.net/luoshengyang/article/details/6677029)中，我们已经系统地介绍了Binder机制和Service的启动过程了，在本文中，简要介绍Activity的启动过程以及后续学习计划。
+
+《[android](http://lib.csdn.net/base/android)系统源代码情景分析》一书正在进击的程序员网（[http://0xcc0xcd.com](http://0xcc0xcd.com/)）中连载，点击进入！
+
+在Android系统中，有两种操作会引发Activity的启动，一种用户点击应用程序图标时，Launcher会为我们启动应用程序的主Activity；应用程序的默认Activity启动起来后，它又可以在内部通过调用startActvity接口启动新的Activity，依此类推，每一个Activity都可以在内部启动新的Activity。通过这种连锁反应，按需启动Activity，从而完成应用程序的功能。
+
+这里，我们通过一个具体的例子来说明如何启动Android应用程序的Activity。Activity的启动方式有两种，一种是显式的，一种是隐式的，隐式启动可以使得Activity之间的藕合性更加松散，因此，这里只关注隐式启动Activity的方法。
+
+首先在Android源代码工程的packages/experimental目录下创建一个应用程序工程目录Activity。关于如何获得Android源代码工程，请参考[在Ubuntu上下载、编译和安装Android最新源代码](http://blog.csdn.net/luoshengyang/article/details/6559955)一文；关于如何在Android源代码工程中创建应用程序工程，请参考[在Ubuntu上为Android系统内置Java应用程序测试Application Frameworks层的硬件服务](http://blog.csdn.net/luoshengyang/article/details/6580267)一文。这里，工程名称就是Activity了，它定义了一个路径为shy.luo.activity的package，这个例子的源代码主要就是实现在这里了。下面，将会逐一介绍这个package里面的文件。
+
+应用程序的默认Activity定义在src/shy/luo/activity/MainActivity.[Java](http://lib.csdn.net/base/java)文件中：
+
+```java
+
+package shy.luo.activity;  
+  
+import shy.luo.activity.R;  
+  
+import android.app.Activity;  
+import android.content.Intent;  
+import android.os.Bundle;  
+import android.util.Log;  
+import android.view.View;  
+import android.view.View.OnClickListener;  
+import android.widget.Button;  
+   
+ public class MainActivity extends Activity  implements OnClickListener {  
+     private final static String LOG_TAG = "shy.luo.activity.MainActivity";
+   
+     private Button startButton = null;  
+   
+     @Override  
+     public void onCreate(Bundle savedInstanceState) {  
+ super.onCreate(savedInstanceState);  
+ setContentView(R.layout.main);  
+   
+ startButton = (Button)findViewById(R.id.button_start);  
+ startButton.setOnClickListener(this);  
+   
+ Log.i(LOG_TAG, "Main Activity Created.");  
+     }  
+   
+     @Override  
+     public void onClick(View v) {  
+ if(v.equals(startButton)) {  
+     Intent intent = new Intent("shy.luo.activity.subactivity");  
+     startActivity(intent);  
+ }  
+     }  
+ }  
+```
+它的实现很简单，当点击它上面的一个按钮的时候，就会启动另外一个名字为“shy.luo.activity.subactivity”的Actvity。
+
+名字为“shy.luo.activity.subactivity”的Actvity实现在src/shy/luo/activity/SubActivity.java文件中：
+
+```java
+
+package shy.luo.activity;  
+  
+import android.app.Activity;  
+import android.os.Bundle;  
+import android.util.Log;  
+import android.view.View;  
+import android.view.View.OnClickListener;  
+import android.widget.Button;  
+  
+public class SubActivity extends Activity implements OnClickListener {  
+    private final static String LOG_TAG = "shy.luo.activity.SubActivity";  
+  
+    private Button finishButton = null;  
+  
+    @Override  
+    public void onCreate(Bundle savedInstanceState) {  
+super.onCreate(savedInstanceState);  
+setContentView(R.layout.sub);  
+  
+finishButton = (Button)findViewById(R.id.button_finish);  
+finishButton.setOnClickListener(this);  
+  
+Log.i(LOG_TAG, "Sub Activity Created.");  
+    }  
+  
+    @Override  
+    public void onClick(View v) {  
+if(v.equals(finishButton)) {  
+    finish();  
+}  
+    }  
+}  
+```
+它的实现也很简单，当点击上面的一个铵钮的时候，就结束自己，回到前面一个Activity中去。
+
+这里我们可以看到，Android应用程序[架构](http://lib.csdn.net/base/architecture)中非常核心的一点：MainActivity不需要知道SubActivity的存在，即它不直接拥有SubActivity的接口，但是它可以通过一个字符串来告诉应用程序框架层，它要启动的Activity的名称是什么，其它的事情就交给应用程序框架层来做，当然，应用程序框架层会根据这个字符串来找到其对应的Activity，然后把它启动起来。这样，就使得Android应用程序中的Activity藕合性很松散，从而使得Android应用程序的模块性程度很高，并且有利于以后程序的维护和更新，对于大型的客户端软件来说，这一点是非常重要的。
+
+当然，应用程序框架能够根据名字来找到相应的Activity，是需要应用程序本身来配合的，这就是要通过应用程序的配置文件AndroidManifest.xml来实现了：
+
+```xml
+
+<?xml version="1.0" encoding="utf-8"?>  
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"  
+    package="shy.luo.activity"  
+    android:versionCode="1"  
+    android:versionName="1.0">  
+    <application android:icon="@drawable/icon" android:label="@string/app_name">  
+<activity android:name=".MainActivity"  
+      android:label="@string/app_name">  
+    <intent-filter>  
+        <action android:name="android.intent.action.MAIN" />  
+        <category android:name="android.intent.category.LAUNCHER" />  
+    </intent-filter>  
+</activity>  
+<activity android:name=".SubActivity"  
+          android:label="@string/sub_activity">  
+    <intent-filter>  
+        <action android:name="shy.luo.activity.subactivity"/>  
+        <category android:name="android.intent.category.DEFAULT"/>  
+    </intent-filter>  
+</activity>  
+    </application>  
+</manifest>  
+```
+从这个配置文件中，我们可以看到，MainActivity被配置成了应用程序的默认Activity，即用户在手机屏幕上点击Activity应用程序图标时，Launcher就会默认启动MainActivity这个Activity：
+
+```xml
+
+<activity android:name=".MainActivity"  
+      android:label="@string/app_name">  
+<intent-filter>  
+<action android:name="android.intent.action.MAIN" />  
+<category android:name="android.intent.category.LAUNCHER" />  
+    </intent-filter>  
+</activity>  
+```
+这个配置文件也将名字“shy.luo.activity.subactivity”和SubActivity关联了起来，因此，应用程序框架层能够根据名字来找到它：
+
+```xml
+
+<activity android:name=".SubActivity"  
+      android:label="@string/sub_activity">  
+    <intent-filter>  
+<action android:name="shy.luo.activity.subactivity"/>  
+<category android:name="android.intent.category.DEFAULT"/>  
+    </intent-filter>  
+</activity>  
+```
+下面再列出这个应用程序的界面配置文件和字符串文件。
+
+界面配置文件在res/layout目录中，main.xml文件对应MainActivity的界面：
+
+```xml
+
+<?xml version="1.0" encoding="utf-8"?>  
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"  
+    android:orientation="vertical"  
+    android:layout_width="fill_parent"  
+    android:layout_height="fill_parent"   
+    android:gravity="center">  
+<Button   
+    android:id="@+id/button_start"  
+    android:layout_width="wrap_content"  
+    android:layout_height="wrap_content"  
+    android:gravity="center"  
+    android:text="@string/start" >  
+</Button>  
+</LinearLayout>  
+```
+而sub.xml对应SubActivity的界面：
+
+```xml
+
+<?xml version="1.0" encoding="utf-8"?>  
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"  
+    android:orientation="vertical"  
+    android:layout_width="fill_parent"  
+    android:layout_height="fill_parent"   
+    android:gravity="center">  
+<Button   
+    android:id="@+id/button_finish"  
+    android:layout_width="wrap_content"  
+    android:layout_height="wrap_content"  
+    android:gravity="center"  
+    android:text="@string/finish" >  
+</Button>  
+</LinearLayout>  
+```
+字符串文件位于res/values/strings.xml文件中：
+
+```xml
+
+<?xml version="1.0" encoding="utf-8"?>  
+<resources>  
+    <string name="app_name">Activity</string>  
+    <string name="sub_activity">Sub Activity</string>  
+    <string name="start">Start sub-activity</string>  
+    <string name="finish">Finish activity</string>  
+</resources>  
+```
+最后，我们还要在工程目录下放置一个编译脚本文件Android.mk：
+
+```
+
+LOCAL_PATH:= $(call my-dir)  
+include $(CLEAR_VARS)  
+  
+LOCAL_MODULE_TAGS := optional  
+  
+LOCAL_SRC_FILES := $(call all-subdir-java-files)  
+  
+LOCAL_PACKAGE_NAME := Activity  
+  
+include $(BUILD_PACKAGE)  
+```
+这样，整个例子的源代码实现就介绍完了，接下来就要编译了。有关如何单独编译Android源代码工程的模块，以及如何打包system.img，请参考
+
+如何单独编译Android源代码中的模块
+
+一文。
+
+执行以下命令进行编译和打包：
+
+```
+USER-NAME@MACHINE-NAME:~/Android$ mmm packages/experimental/Activity    
+USER-NAME@MACHINE-NAME:~/Android$ make snod   
+```
+这样，打包好的Android系统镜像文件system.img就包含我们前面创建的Activity应用程序了。
+
+再接下来，就是运行模拟器来运行我们的例子了。关于如何在Android源代码工程中运行模拟器，请参考
+
+在Ubuntu上下载、编译和安装Android最新源代码一文。
+
+执行以下命令启动模拟器：
+
+```
+USER-NAME@MACHINE-NAME:~/Android$ emulator    
+```
+模拟器启动起，就可以在屏幕上看到Activity应用程序图标了：
+
+ 点击Activity这个应用程序图标后，Launcher就会把MainActivity启动起来：
+
+![img](http://hi.csdn.net/attachment/201108/14/0_1313303791VrbM.gif)
+
+点击上面的Start sub-activity铵钮，MainActivity内部就会通过startActivity接口来启动SubActivity：
+
+```java
+Intent intent = new Intent("shy.luo.activity.subactivity");  
+startActivity(intent);  
+```
+如下图所示：
+
+![img](http://hi.csdn.net/attachment/201108/14/0_131330397835ee.gif)
+
+无论是通过点击应用程序图标来启动Activity，还是通过Activity内部调用startActivity接口来启动新的Activity，都要借助于应用程序框架层的ActivityManagerService服务进程。在前面一篇文章[Android系统在新进程中启动自定义服务过程（startService）的原理分析](http://blog.csdn.net/luoshengyang/article/details/6677029)中，我们已经看到，Service也是由ActivityManagerService进程来启动的。在Android应用程序框架层中，ActivityManagerService是一个非常重要的接口，它不但负责启动Activity和Service，还负责管理Activity和Service。
+
+Android应用程序框架层中的ActivityManagerService启动Activity的过程大致如下图所示：
+
+![img](http://hi.csdn.net/attachment/201108/14/0_1313305334OkCc.gif)
+
+ 在这个图中，ActivityManagerService和ActivityStack位于同一个进程中，而ApplicationThread和ActivityThread位于另一个进程中。其中，ActivityManagerService是负责管理Activity的生命周期的，ActivityManagerService还借助ActivityStack是来把所有的Activity按照后进先出的顺序放在一个堆栈中；对于每一个应用程序来说，都有一个ActivityThread来表示应用程序的主进程，而每一个ActivityThread都包含有一个ApplicationThread实例，它是一个Binder对象，负责和其它进程进行通信。
+
+下面简要介绍一下启动的过程：
+
+Step 1. 无论是通过Launcher来启动Activity，还是通过Activity内部调用startActivity接口来启动新的Activity，都通过Binder进程间通信进入到ActivityManagerService进程中，并且调用ActivityManagerService.startActivity接口； 
+
+Step 2. ActivityManagerService调用ActivityStack.startActivityMayWait来做准备要启动的Activity的相关信息；
+
+Step 3. ActivityStack通知ApplicationThread要进行Activity启动调度了，这里的ApplicationThread代表的是调用ActivityManagerService.startActivity接口的进程，对于通过点击应用程序图标的情景来说，这个进程就是Launcher了，而对于通过在Activity内部调用startActivity的情景来说，这个进程就是这个Activity所在的进程了；
+
+Step 4. ApplicationThread不执行真正的启动操作，它通过调用ActivityManagerService.activityPaused接口进入到ActivityManagerService进程中，看看是否需要创建新的进程来启动Activity；
+
+Step 5. 对于通过点击应用程序图标来启动Activity的情景来说，ActivityManagerService在这一步中，会调用startProcessLocked来创建一个新的进程，而对于通过在Activity内部调用startActivity来启动新的Activity来说，这一步是不需要执行的，因为新的Activity就在原来的Activity所在的进程中进行启动；
+
+Step 6. ActivityManagerServic调用ApplicationThread.scheduleLaunchActivity接口，通知相应的进程执行启动Activity的操作；
+
+Step ApplicationThread把这个启动Activity的操作转发给ActivityThread，ActivityThread通过ClassLoader导入相应的Activity类，然后把它启动起来。
+
+这样，7. Android应用程序的Activity启动过程就简要介绍到这里了，在接下来的两篇文章中，我们将根据Activity的这两种启动情景，深入到应用程序框架层的源代码里面去，一步一步地分析它们的启动过程：
+
+1. [Android应用程序启动过程的源代码分析](http://blog.csdn.net/luoshengyang/article/details/6689748)
+
+2. [Android应用程序内部启动Activity过程（startActivity）的源代码分析](http://blog.csdn.net/luoshengyang/article/details/6703247)
