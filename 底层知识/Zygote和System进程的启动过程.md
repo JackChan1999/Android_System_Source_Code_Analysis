@@ -19,14 +19,26 @@ Zygote进程孵化器
 5. 启动System进程
    - SystemServer.main()
    - SystemServer.init1() 启动C++语言开发的系统服务
-   - SystemServer.init2() 启动java语言开发的系统服务
+   - SystemServer.init2() 启动java语言开发的系统服务 new ServerThread().start()
 6. ServerThread
-   - 启动系统服务ActivityManagerService、WindowManagerService、PackageManagerService、ContentService，并把系统服务注册到ServiceManager中
+   - 在run方法中启动系统服务ActivityManagerService、WindowManagerService、PackageManagerService、ContentService，并通过ServiceManager.addService()把系统服务注册到ServiceManager中
    - ActivityManagerService.main()
    - PackageManagerService.main()
    - ContentService.main()
    - WindowManagerService.main()
    - ServiceManager.addService()
+
+Zygote启动过程
+
+![](img/Zygote启动过程.png)
+
+System启动过程
+
+![](img/System启动过程.png)
+
+应用程序启动过程
+
+![](img/应用程序启动过程.png)
 
 System进程：运行系统关键服务，在ServerThread中通过各种service的main()方法把服务启动起来，并通过ServiceManager.addService()把服务注册到ServiceManager中
 

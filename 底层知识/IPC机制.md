@@ -521,3 +521,18 @@ ServiceManager的java代理对象的内部有一个成员变量mRemote，它的�
 - newActivity()
 
 ## Binder线程池
+
+## Activity组件的启动过程
+
+- 根Activity
+- 子Activity
+- 启动方式
+  - 显式启动，需要知道类名
+  - 隐式启动，需要知道组件名android:name
+- action
+- category
+- android:process
+- ActivityStack：用来描述一个Activity堆栈
+- ProcessThread：用来描述一个应用程序进程
+- ActivityThread：代表主线程
+- ActivityManagerService：系统关键服务，运行在System进程中，负责启动和调度应用程序组件
