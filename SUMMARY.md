@@ -6,6 +6,7 @@
     * [那两年炼就的Android内功修养](随笔\那两年炼就的Android内功修养.md)
     * [《Android系统源代码情景分析》一书勘误](随笔\《Android系统源代码情景分析》一书勘误.md)
     * [专访罗升阳：老罗的Android之旅](随笔\专访罗升阳：老罗的Android之旅.md)
+* [HAL 硬件抽象层](HAL\Android硬件抽象层（HAL）概要介绍.md)
 * [AOSP源码开发](AOSP/README.md)
     * [手把手教你android源码开发-1](AOSP/手把手教你android源码开发一.md)
     * [Android源代码情景分析法](AOSP\Android源代码情景分析法.md)
