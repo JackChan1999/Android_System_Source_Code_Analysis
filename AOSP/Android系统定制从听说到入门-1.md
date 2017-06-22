@@ -1,8 +1,4 @@
-- [手把手教你android源码开发一](http://www.jianshu.com/p/c01ce375e77a)
-- [手把手教你android源码开发二](http://www.jianshu.com/p/6b2de1c4a1bc)
-
-本文配套视频：
-[https://v.qq.com/x/page/j0515fs0k2e.html](https://v.qq.com/x/page/j0515fs0k2e.html)
+> 本文配套视频：https://v.qq.com/x/page/j0515fs0k2e.html
 
 android源码之前分为四层，如下图：
 
@@ -33,8 +29,3 @@ HAL层：（Hardware Abstract Layer）硬件抽象层。Android系统里封装�
 AOSP官网提供系统开发相关指导，比如源码的环境搭建，下载，编译，维护，更新版本，开放驱动的下载等。
 
 ![img](http://upload-images.jianshu.io/upload_images/4037105-56d4bbe84bed421e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-
-- 欢迎关注微信公众号、长期为您推荐优秀博文、开源项目、视频
-- 微信公众号名称：Android干货程序员
-
-![img](http://upload-images.jianshu.io/upload_images/4037105-8f737b5104dd0b5d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
