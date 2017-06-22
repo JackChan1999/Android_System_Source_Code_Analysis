@@ -1,4 +1,4 @@
-虽然好几个月没更新博客了，但是老罗一直有在准备可以分享的东西的。除了早前在微博分享Android4.2相关技术之外，这次还特意准备了13个PPT，总结之前所研究过的东西。内容从[Android](http://lib.csdn.net/base/android)组件设计思想，到[android](http://lib.csdn.net/base/android)源码开发和调试环境搭建，再到Android专用驱动和应用程序[架构](http://lib.csdn.net/base/architecture)等。可以作为《老罗的Android之旅》博客和《Android系统源代码情景分析》一书的导读，希望对大家有帮助。
+虽然好几个月没更新博客了，但是老罗一直有在准备可以分享的东西的。除了早前在微博分享Android4.2相关技术之外，这次还特意准备了13个PPT，总结之前所研究过的东西。内容从[Android](http://lib.csdn.net/base/Android)组件设计思想，到[Android](http://lib.csdn.net/base/android)源码开发和调试环境搭建，再到Android专用驱动和应用程序[架构](http://lib.csdn.net/base/architecture)等。可以作为《老罗的Android之旅》博客和《Android系统源代码情景分析》一书的导读，希望对大家有帮助。
 
 《Android系统源代码情景分析》一书正在进击的程序员网（[http://0xcc0xcd.com](http://0xcc0xcd.com/)）中连载，点击进入！
 
@@ -10,7 +10,7 @@ Android应用开发的哲学是把一切都看作是组件。把应用程序组�
 
 理解Android组件设计思想，对Android应用程序架构会有更好的认识。这一节讲Android组件化设计的背景、理念、原则，以及Android在OS级别上提供的组件化支持，其中还会包含一个实验来验证这种组件化设计思想，可以对Android系统有一个高层次的抽象理解。
 
-下载地址：[http://download.csdn.net/detail/luoshengyang/6439629](http://download.csdn.net/detail/luoshengyang/6439629)
+下载地址：http://download.csdn.net/detail/luoshengyang/6439629
 
 ### 2. Android源代码开发和调试环境搭建
 
@@ -18,7 +18,7 @@ Android源代码开发环境与SDK开发环境相比，优势是可以查看和�
 
 这个PPT主要讲Android源代码下载、编译和运行，以及C/C++、Java代码的调试。
 
-下载地址：[http://download.csdn.net/detail/luoshengyang/6439633](http://download.csdn.net/detail/luoshengyang/6439633)
+下载地址：http://download.csdn.net/detail/luoshengyang/6439633
 
 ### 3. Android系统架构概述
 

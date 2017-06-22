@@ -1,4 +1,4 @@
-经过两年的时间，终于完成对[Android](http://lib.csdn.net/base/android)系统的研究了。[android](http://lib.csdn.net/base/android)是一个博大精深的系统，老罗不敢说自己精通了（事实上最讨厌的就是说自己精通神马神马的了，或者说企业说要招聘精通神马神马的人才），但是至少可以说打通了整个Android系统，从最上面的应用层，一直到最下面的[Linux](http://lib.csdn.net/base/linux)内核，炼就的是一种内功修养。这篇文章和大家一起分享这两年研究Android系统的历程，以此感谢大家一直以来的支持和鼓励。
+经过两年的时间，终于完成对[Android](http://lib.csdn.net/base/Android)系统的研究了。[Android](http://lib.csdn.net/base/android)是一个博大精深的系统，老罗不敢说自己精通了（事实上最讨厌的就是说自己精通神马神马的了，或者说企业说要招聘精通神马神马的人才），但是至少可以说打通了整个Android系统，从最上面的应用层，一直到最下面的[Linux](http://lib.csdn.net/base/linux)内核，炼就的是一种内功修养。这篇文章和大家一起分享这两年研究Android系统的历程，以此感谢大家一直以来的支持和鼓励。
 
 《Android系统源代码情景分析》一书正在进击的程序员网（[http://0xcc0xcd.com](http://0xcc0xcd.com/)）中连载，点击进入！
 
@@ -130,11 +130,11 @@
 
 对于Android应用开发，力推官方文档：
 
-- [http://developer.android.com/training/index.html](http://developer.android.com/training/index.html)
+- http://developer.android.com/training/index.html
 
-- [http://developer.android.com/guide/components/index.html](http://developer.android.com/guide/components/index.html)
+- http://developer.android.com/guide/components/index.html
 
-- [http://developer.android.com/tools/index.html](http://developer.android.com/tools/index.html)
+- http://developer.android.com/tools/index.html
 
 ## 研究过的内容
 
@@ -150,11 +150,11 @@
 
 主要就是：
 
-（1）通过阅读相关的书籍来了解Linux内核和Android应用基础知识
+1.1 通过阅读相关的书籍来了解Linux内核和Android应用基础知识
 
 - [Android学习启动篇](http://blog.csdn.net/luoshengyang/article/details/6557518)
 
-（2）搭建好Android源代码环境
+1.2 搭建好Android源代码环境
 
 - [在Ubuntu上下载、编译和安装Android最新源代码](http://blog.csdn.net/luoshengyang/article/details/6559955)
 
@@ -164,7 +164,7 @@
 
 - [制作可独立分发的Android模拟器](http://blog.csdn.net/luoshengyang/article/details/6586759)
 
-（3）Android系统有很多C++代码，这些C++代码用到了很多[智能](http://lib.csdn.net/base/aiplanning)指针，因此有必要了解一下Android系统在C/C++ Runtime Framework中提供的智能指针
+1.3 Android系统有很多C++代码，这些C++代码用到了很多[智能](http://lib.csdn.net/base/aiplanning)指针，因此有必要了解一下Android系统在C/C++ Runtime Framework中提供的智能指针
 
 - [Android系统的智能指针（轻量级指针、强指针和弱指针）的实现原理分析](http://blog.csdn.net/luoshengyang/article/details/6786239)
 
@@ -172,7 +172,7 @@
 
 这些专用驱动就是指Logger、Binder和Ashmem，它们整个Android系统的基石：
 
-（1）Logger
+2.1 Logger
 
 - [ 浅谈Android系统开发中LOG的使用](http://blog.csdn.net/luoshengyang/article/details/6581828)
 
@@ -182,7 +182,7 @@
 
 - [Android日志系统Logcat源代码简要分析](http://blog.csdn.net/luoshengyang/article/details/6606957)
 
-（2）Binder
+2.2 Binder
 
 - [Android进程间通信（IPC）机制Binder简要介绍和学习计划](http://blog.csdn.net/luoshengyang/article/details/6618363)
 
@@ -196,7 +196,7 @@
 
 - [Android系统进程间通信Binder机制在应用程序框架层的Java接口源代码分析](http://blog.csdn.net/luoshengyang/article/details/6642463)
 
-（3）Ashmem
+2.3 Ashmem
 
 - [Android系统匿名共享内存Ashmem（Anonymous Shared Memory）简要介绍和学习计划](http://blog.csdn.net/luoshengyang/article/details/6651971)
 
@@ -228,7 +228,7 @@
 
 应用程序组件是Android系统的核心，为开发者提供了贴心的服务。应用程序组件有四种，分别是Activity、Service、Broadcast Receiver和Content Provider。围绕应用程序组件，又有应用程序进程、消息循环和安装三个相关模块。
 
-（1）Activity
+4.1 Activity
 
 - [Android应用程序的Activity启动过程简要介绍和学习计划](http://blog.csdn.net/luoshengyang/article/details/6685853)
 
@@ -240,13 +240,13 @@
 
 - [解开Android应用程序组件Activity的"singleTask"之谜](http://blog.csdn.net/luoshengyang/article/details/6714543)
 
-（2）Service
+4.2 Service
 
 - [Android系统在新进程中启动自定义服务过程（startService）的原理分析](http://blog.csdn.net/luoshengyang/article/details/6677029)
 
 - [Android应用程序绑定服务（bindService）的过程源代码分析](http://blog.csdn.net/luoshengyang/article/details/6745181)
 
-（3）Broadcast Receiver
+4.3 Broadcast Receiver
 
 - [Android系统中的广播（Broadcast）机制简要介绍和学习计划](http://blog.csdn.net/luoshengyang/article/details/6730748)
 
@@ -254,7 +254,7 @@
 
 - [Android应用程序发送广播（sendBroadcast）的过程分析](http://blog.csdn.net/luoshengyang/article/details/6744448)
 
-（4）Content Provider
+4.4 Content Provider
 
 - [Android应用程序组件Content Provider简要介绍和学习计划](http://blog.csdn.net/luoshengyang/article/details/6946067)
 
@@ -266,13 +266,13 @@
 
 - [Android应用程序组件Content Provider的共享数据更新通知机制分析](http://blog.csdn.net/luoshengyang/article/details/6985171)
 
-（5）进程
+4.5 进程
 
 - [Android系统进程Zygote启动过程的源代码分析](http://blog.csdn.net/luoshengyang/article/details/6768304)
 
 - [Android应用程序进程启动过程的源代码分析](http://blog.csdn.net/luoshengyang/article/details/6747696)
 
-（6）消息循环
+4.6 消息循环
 
 - [Android应用程序消息处理机制（Looper、Handler）分析](http://blog.csdn.net/luoshengyang/article/details/6817933)
 
@@ -280,7 +280,7 @@
 
 - [Android应用程序线程消息循环模型分析](http://blog.csdn.net/luoshengyang/article/details/6905587)
 
-（7）安装
+4.7 安装
 
 - [Android应用程序安装过程源代码分析](http://blog.csdn.net/luoshengyang/article/details/6766010)
 
@@ -434,6 +434,6 @@ Android系统的应用程序及部分应用程序框架是使用Java语言开发
 
 如果需要邀请老罗去参加分享，可以通过微博或者邮箱和老罗联系，非常感谢大家两年以来的支持！
 
-邮箱：shyluo@gmail.com
+邮箱：<shyluo@gmail.com>
 
 微博：http://weibo.com/shengyangluo
