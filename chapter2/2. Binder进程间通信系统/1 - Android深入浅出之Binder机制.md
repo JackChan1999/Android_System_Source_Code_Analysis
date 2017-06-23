@@ -17,25 +17,15 @@ MediaService是一个应用程序，虽然Android搞了七七八八的JAVA之类
 MediaService的源码文件在：framework\base\Media\MediaServer\Main_mediaserver.cpp中。让我们看看到底是个什么玩意儿！
 ```c
 int main(int argc, char** argv)
-
 {
-
-//FT，就这么简单？？
-
-//获得一个ProcessState实例
-
-sp<ProcessState> proc(ProcessState::self());
-
-//得到一个ServiceManager对象
-
+	//FT，就这么简单？？
+	//获得一个ProcessState实例
+	sp<ProcessState> proc(ProcessState::self());
+	//得到一个ServiceManager对象
     sp<IServiceManager> sm = defaultServiceManager();
-
     MediaPlayerService::instantiate();//初始化MediaPlayerService服务
-
     ProcessState::self()->startThreadPool();//看名字，启动Process的线程池？
-
     IPCThreadState::self()->joinThreadPool();//将自己加入到刚才的线程池？
-
 }
 ```
 其中，我们只分析MediaPlayerService。
@@ -53,57 +43,33 @@ sp，究竟是smart pointer还是strong pointer呢？其实我后来发现不用
 ProcessState位置在framework\base\libs\binder\ProcessState.cpp
 ```c
 sp<ProcessState> ProcessState::self()
-
 {
-
     if (gProcess != NULL) return gProcess;---->第一次进来肯定不走这儿
-
     AutoMutex _l(gProcessMutex);--->锁保护
-
     if (gProcess == NULL) gProcess = new ProcessState;--->创建一个ProcessState对象
-
 return gProcess;--->看见没，这里返回的是指针，但是函数返回的是sp<xxx>，所以
-
 //把sp<xxx>看成是XXX*是可以的
-
 }
 ```
 再来看看ProcessState构造函数
 ```c
 //这个构造函数看来很重要
-
 ProcessState::ProcessState()
-
     : mDriverFD(open_driver())----->Android很多代码都是这么写的,稍不留神就没看见这里调用了一个很重要的函数
-
     , mVMStart(MAP_FAILED)//映射内存的起始地址
-
     , mManagesContexts(false)
-
     , mBinderContextCheckFunc(NULL)
-
     , mBinderContextUserData(NULL)
-
     , mThreadPoolStarted(false)
-
     , mThreadPoolSeq(1)
-
 {
-
 if (mDriverFD >= 0) {
-
-//BIDNER_VM_SIZE定义为(1*1024*1024) - (4096 *2) 1M-8K
-
+		//BIDNER_VM_SIZE定义为(1*1024*1024) - (4096 *2) 1M-8K
         mVMStart = mmap(0, BINDER_VM_SIZE, PROT_READ, MAP_PRIVATE | MAP_NORESERVE,
-
- mDriverFD, 0);//这个需要你自己去man mmap的用法了，不过大概意思就是
-
-//将fd映射为内存，这样内存的memcpy等操作就相当于write/read(fd)了
-
+ 		mDriverFD, 0);//这个需要你自己去man mmap的用法了，不过大概意思就是
+		//将fd映射为内存，这样内存的memcpy等操作就相当于write/read(fd)了
     }
-
     ...
-
 }
 ```
 最讨厌这种在构造list中添加函数的写法了，常常疏忽某个变量的初始化是一个函数调用的结果。
@@ -113,30 +79,19 @@ open_driver，就是打开/dev/binder这个设备，这个是android在内核中
 进程间通讯而设置的一个虚拟的设备。BTW，说白了就是内核的提供的一个机制，这个和我们用socket加NET_LINK方式和内核通讯是一个道理。
 ```c
 static int open_driver()
-
 {
-
     int fd = open("/dev/binder", O_RDWR);//打开/dev/binder
-
     if (fd >= 0) {
-
       ....
-
         size_t maxThreads = 15;
-
        //通过ioctl方式告诉内核，这个fd支持最大线程数是15个。
-
         result = ioctl(fd, BINDER_SET_MAX_THREADS, &maxThreads);    }
-
 return fd;
 ```
 好了，到这里Process::self就分析完了，到底干什么了呢？
 
-打开/dev/binder设备，这样的话就相当于和内核binder机制有了交互的通道
-
-映射fd到内存，设备的fd传进去后，估计这块内存是和binder设备共享的
-
- 
+- 打开/dev/binder设备，这样的话就相当于和内核binder机制有了交互的通道
+- 映射fd到内存，设备的fd传进去后，估计这块内存是和binder设备共享的
 
 接下来，就到调用defaultServiceManager()地方了。
 
@@ -145,119 +100,71 @@ return fd;
 defaultServiceManager位置在framework\base\libs\binder\IServiceManager.cpp中
 ```c
 sp<IServiceManager> defaultServiceManager()
-
 {
-
     if (gDefaultServiceManager != NULL) return gDefaultServiceManager;
-
     //又是一个单例，设计模式中叫 singleton。
-
     {
-
         AutoMutex _l(gDefaultServiceManagerLock);
-
         if (gDefaultServiceManager == NULL) {
-
-//真正的gDefaultServiceManager是在这里创建的喔
-
+			//真正的gDefaultServiceManager是在这里创建的喔
             gDefaultServiceManager = interface_cast<IServiceManager>(
-
                 ProcessState::self()->getContextObject(NULL));
-
         }
 
     }
-
    return gDefaultServiceManager;
-
 }
-
 -----》
-
 gDefaultServiceManager = interface_cast<IServiceManager>(
-
                 ProcessState::self()->getContextObject(NULL));
-
 ProcessState::self，肯定返回的是刚才创建的gProcess，然后调用它的getContextObject，注意，传进去的是NULL，即0
-
 //回到ProcessState类，
-
 sp<IBinder> ProcessState::getContextObject(const sp<IBinder>& caller)
-
 {
-
 if (supportsProcesses()) {//该函数根据打开设备是否成功来判断是否支持process，
-
-//在真机上肯定走这个
-
+		//在真机上肯定走这个
         return getStrongProxyForHandle(0);//注意，这里传入0
-
     }
-
 }
-
 ----》进入到getStrongProxyForHandle，函数名字怪怪的，经常严重阻碍大脑运转
-
 //注意这个参数的命名，handle。搞过windows的应该比较熟悉这个名字，这是对
-
 //资源的一种标示，其实说白了就是某个数据结构，保存在数组中，然后handle是它在这个数组中的索引。--->就是这么一个玩意儿
-
 sp<IBinder> ProcessState::getStrongProxyForHandle(int32_t handle)
-
 {
-
     sp<IBinder> result;
-
     AutoMutex _l(mLock);
-
 handle_entry* e = lookupHandleLocked(handle);--》哈哈，果然，从数组中查找对应
-
 索引的资源，lookupHandleLocked这个就不说了，内部会返回一个handle_entry
-
- 下面是 handle_entry 的结构
+```
+下面是 handle_entry 的结构
 ```c
 /*
-
 struct handle_entry {
-
                 IBinder* binder;--->Binder
-
                 RefBase::weakref_type* refs;-->不知道是什么，不影响.
-
             };
-
 */
 
     if (e != NULL) {
-
         IBinder* b = e->binder; -->第一次进来，肯定为空
-
         if (b == NULL || !e->refs->attemptIncWeak(this)) {
-
             b = new BpBinder(handle); --->看见了吧，创建了一个新的BpBinder
-
             e->binder = b;
-
             result = b;
-
         }....
-
     }
-
     return result; 返回刚才创建的BpBinder。
-
 }
-
 //到这里，是不是有点乱了？对，当人脑分析的函数调用太深的时候，就容易忘记。
 ```
-我们是从gDefaultServiceManager = interface_cast<IServiceManager>(
-
-                ProcessState::self()->getContextObject(NULL));
-
+我们是从
+```c
+gDefaultServiceManager = interface_cast<IServiceManager>(ProcessState::self()->getContextObject(NULL));
+```
 开始搞的，现在，这个函数调用将变成
-
+```c
 gDefaultServiceManager = interface_cast<IServiceManager>(new BpBinder(0));
-
+```
 BpBinder又是个什么玩意儿？Android名字起得太眼花缭乱了。
 
 因为还没介绍Binder机制的大架构，所以这里介绍BpBinder不合适，但是又讲到BpBinder了，不介绍Binder架构似乎又说不清楚....，sigh！
@@ -269,125 +176,67 @@ BpBinder又是个什么玩意儿？Android名字起得太眼花缭乱了。
 BpBinder位置在framework\base\libs\binder\BpBinder.cpp中。
 ```c
 BpBinder::BpBinder(int32_t handle)
-
     : mHandle(handle) //注意，接上述内容，这里调用的时候传入的是0
-
     , mAlive(1)
-
     , mObitsSent(0)
-
     , mObituaries(NULL)
-
 {
-
    IPCThreadState::self()->incWeakHandle(handle);//FT，竟然到IPCThreadState::self()
-
 }
 ```
 这里一块说说吧，IPCThreadState::self估计怎么着又是一个singleton吧？
 ```c
 //该文件位置在framework\base\libs\binder\IPCThreadState.cpp
-
 IPCThreadState* IPCThreadState::self()
-
 {
-
     if (gHaveTLS) {//第一次进来为false
-
 restart:
-
         const pthread_key_t k = gTLS;
-
 //TLS是Thread Local Storage的意思，不懂得自己去google下它的作用吧。这里只需要
-
 //知道这种空间每个线程有一个，而且线程间不共享这些空间，好处是？我就不用去搞什么
-
 //同步了。在这个线程，我就用这个线程的东西，反正别的线程获取不到其他线程TLS中的数据。===》这句话有漏洞，钻牛角尖的明白大概意思就可以了。
-
 //从线程本地存储空间中获得保存在其中的IPCThreadState对象
-
 //这段代码写法很晦涩，看见没，只有pthread_getspecific,那么肯定有地方调用
-
 // pthread_setspecific。
-
         IPCThreadState* st = (IPCThreadState*)pthread_getspecific(k);
-
         if (st) return st;
-
         return new IPCThreadState;//new一个对象，
-
     }
-
-   
-
     if (gShutdown) return NULL;
-
-   
-
     pthread_mutex_lock(&gTLSMutex);
-
     if (!gHaveTLS) {
-
         if (pthread_key_create(&gTLS, threadDestructor) != 0) {
-
             pthread_mutex_unlock(&gTLSMutex);
-
             return NULL;
-
         }
-
         gHaveTLS = true;
-
     }
-
     pthread_mutex_unlock(&gTLSMutex);
-
 goto restart; //我FT，其实goto没有我们说得那样卑鄙，汇编代码很多跳转语句的。
-
 //关键是要用好。
-
 }
-
 //这里是构造函数，在构造函数里边pthread_setspecific
-
 IPCThreadState::IPCThreadState()
-
     : mProcess(ProcessState::self()), mMyThreadId(androidGetTid())
-
 {
-
     pthread_setspecific(gTLS, this);
-
     clearCaller();
-
-mIn.setDataCapacity(256);
-
-//mIn,mOut是两个Parcel，干嘛用的啊？把它看成是命令的buffer吧。再深入解释，又会大脑停摆的。
-
+	mIn.setDataCapacity(256);
+	//mIn,mOut是两个Parcel，干嘛用的啊？把它看成是命令的buffer吧。再深入解释，又会大脑停摆的。
     mOut.setDataCapacity(256);
-
 }
 ```
 出来了，终于出来了....，恩，回到BpBinder那。
 ```
 BpBinder::BpBinder(int32_t handle)
-
     : mHandle(handle) //注意，接上述内容，这里调用的时候传入的是0
-
     , mAlive(1)
-
     , mObitsSent(0)
-
     , mObituaries(NULL)
-
 {
-
 ......
-
 IPCThreadState::self()->incWeakHandle(handle);
-
 什么incWeakHandle，不讲了..
-
 }
 ```
 喔，new BpBinder就算完了。到这里，我们创建了些什么呢？
@@ -398,7 +247,7 @@ IPCThreadState::self()->incWeakHandle(handle);
 
 - BpBinder有了，内部handle值为0
 
- 
+
 ```
 gDefaultServiceManager = interface_cast<IServiceManager>(new BpBinder(0));
 ```
@@ -411,13 +260,9 @@ interface_cast，我第一次接触的时候，把它看做类似的static_cast�
 IInterface.h位于framework/base/include/binder/IInterface.h
 ```c
 template<typename INTERFACE>
-
 inline sp<INTERFACE> interface_cast(const sp<IBinder>& obj)
-
 {
-
     return INTERFACE::asInterface(obj);
-
 }
 ```
 所以，上面等价于：
@@ -856,11 +701,11 @@ status_t IPCThreadState::transact(int32_t handle,
 
     status_t err = data.errorCheck();
 
- 
+
 
     flags |= TF_ACCEPT_FDS;
 
-   
+
 
     if (err == NO_ERROR) {
 
@@ -870,7 +715,7 @@ err = writeTransactionData(BC_TRANSACTION, flags, handle, code, data, NULL);
 
     }
 
-   
+
 
       if ((flags & TF_ONE_WAY) == 0) {
 
@@ -906,7 +751,7 @@ status_t IPCThreadState::writeTransactionData(int32_t cmd, uint32_t binderFlags,
 
     binder_transaction_data tr;
 
- 
+
 
     tr.target.handle = handle;
 
@@ -914,7 +759,7 @@ status_t IPCThreadState::writeTransactionData(int32_t cmd, uint32_t binderFlags,
 
     tr.flags = binderFlags;
 
-   
+
 
     const status_t err = data.errorCheck();
 
@@ -958,7 +803,7 @@ status_t IPCThreadState::waitForResponse(Parcel *reply, status_t *acquireResult)
 
     int32_t err;
 
- 
+
 
 while (1) {
 
@@ -978,7 +823,7 @@ while (1) {
 
         cmd = mIn.readInt32();
 
- 
+
 
         switch (cmd) {
 
@@ -1148,7 +993,7 @@ void binder_loop(struct binder_state *bs, binder_handler func)
 
         bwr.read_buffer = (unsigned) readbuf;
 
- 
+
 
         res = ioctl(bs->fd, BINDER_WRITE_READ, &bwr);
 
@@ -1182,7 +1027,7 @@ int svcmgr_handler(struct binder_state *bs,
 
     void *ptr;
 
- 
+
 
     s = bio_get_string16(msg, &len);
 
@@ -1322,7 +1167,7 @@ public:
 
     virtual const String16&     getInterfaceDescriptor() const;
 
- 
+
 
 protected:
 
@@ -1468,7 +1313,7 @@ int Thread::_threadLoop(void* user)
 
     self->mHoldSelf.clear();
 
- 
+
 
     do {
 
@@ -1522,7 +1367,7 @@ void IPCThreadState::joinThreadPool(bool isMain)
 
        } while (result != -ECONNREFUSED && result != -EBADF);
 
- 
+
 
     mOut.writeInt32(BC_EXIT_LOOPER);
 
@@ -1610,7 +1455,7 @@ sp<IMediaPlayer> player = create(
 
                     pid, client, url, numHeaders > 0 ? &headers : NULL);
 
- 
+
 
             reply->writeStrongBinder(player->asBinder());
 
@@ -1656,7 +1501,7 @@ binder = sm->getService(String16("media.player"));
 
         } while(true);
 
- 
+
 
 //通过interface_cast，将这个binder转化成BpMediaPlayerService
 

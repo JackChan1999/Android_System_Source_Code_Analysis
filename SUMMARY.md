@@ -66,7 +66,7 @@
     - [Android系统镜像文件的打包过程分析](Compile/3 - Android系统镜像文件的打包过程分析.md)
     - [从CM刷机过程和原理分析Android系统结构](Compile/从CM刷机过程和原理分析Android系统结构.md)
 - [SEAndroid安全机制](SEAndroid安全机制/SEAndroid安全机制.md)
-- [资源管理框架]()
+- [资源管理框架](AssetManager/README.md)
     - [资源管理框架](AssetManager/1- 资源管理框架.md)
     - [Android应用程序资源的编译和打包过程分析](AssetManager/2 - Android应用程序资源的编译和打包过程分析.md)
     - [Android应用程序资源管理器的创建过程分析](AssetManager/3 - Android应用程序资源管理器的创建过程分析.md)
