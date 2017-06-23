@@ -45,7 +45,7 @@
     - [红茶一杯话Binder（传输机制篇_上）](chapter2/2. Binder进程间通信系统/红茶一杯话Binder（传输机制篇_上）.md)
     - [红茶一杯话Binder（传输机制篇_中）](chapter2/2. Binder进程间通信系统/红茶一杯话Binder（传输机制篇_中）.md)
     - [红茶一杯话Binder（传输机制篇_下）](chapter2/2. Binder进程间通信系统/红茶一杯话Binder（传输机制篇_下）.md)
-- [Dalvik虚拟机](DVM/README.md.md)
+- [Dalvik虚拟机](DVM/README.md)
     - [Dalvik虚拟机](DVM/1. Dalvik虚拟机.md)
     - [Dalvik虚拟机的启动过程分析](DVM/2. Dalvik虚拟机的启动过程分析.md)
     - [Dalvik虚拟机的运行过程分析](DVM/3. Dalvik虚拟机的运行过程分析.md)

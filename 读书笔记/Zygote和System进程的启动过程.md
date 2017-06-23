@@ -6,7 +6,9 @@ Zygote进程在启动完成之后，会马上将System进程启动起来，以�
 
 Zygote进程是由Android系统的第一个进程init启动起来的。init进程是在内核加载完成之后就启动起来的，它在启动的过程中，会读取根目录下的一个脚本文件init.rc，以便可以将其他需要开机启动的进程也一起启动起来。
 
-![](img/Android启动流程.png) ![](img/启动流程.png)
+![](img/Android启动流程.png) 
+
+![](img/启动流程.png)
 
 ![](img/系统启动流程图.png)
 

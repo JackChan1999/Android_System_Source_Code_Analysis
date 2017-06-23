@@ -81,22 +81,40 @@ PS：Linux命令大部分在Mac OS 下也是通用的，它们都属于类Unix�
 
 ### 3.3系统操作
 
-| 命令                       | 功能                                       |
-| ------------------------ | ---------------------------------------- |
-| su                       | 切换到某一个用户(需要输入要切换的用户的密码) eg: su username  |
-| sudo                     | 非root用户强制执行一些需要root权限的操作(需要输入当前用户的密码) eg: sudo rm filename |
-| apt-get                  | Ubuntu的软件管家，进行软件的更新，卸载与维护。               |
-| sudo apt-get update      | 更新到最新软件列表                                |
-| sudo apt-get install vim | 安装VIM                                    |
-| sudo apt-get remove vim  | 卸载VIM                                    |
-| vim                      | 终端下的文本编辑器。                               |
-| i                        | 进入编辑模式                                   |
-| ESC                      | 跳到命令模式                                   |
-| dd                       | 删除一行                                     |
-| (:wq)                    | 保存退出                                     |
-| (:q!)                    | 不保存退出                                    |
-| cat                      | 查看文件,将文本内容打印到控制台。                        |
-| chmod                    | 修改文件权限。eg：chmod a+x xxx.sh chmod 777 xxx.sh，权限设定可以使用字串\[ugoa]\[+-=][rwx]或者数字 (r=4,w=2,x=1,-=0)，u 拥有者，g 用户组，o 其他用户，a 所有人。- 表示增加权限、- 表示取消权限、= 表示直接指定权限 |
+| 命令      | 功能                                       |
+| ------- | ---------------------------------------- |
+| su      | 切换到某一个用户(需要输入要切换的用户的密码) eg: su username  |
+| sudo    | 非root用户强制执行一些需要root权限的操作(需要输入当前用户的密码) eg: sudo rm filename |
+| apt-get | Ubuntu的软件管家，进行软件的更新，卸载与维护。               |
+| vim     | 终端下的文本编辑器。                               |
+| i       | 进入编辑模式                                   |
+| ESC     | 跳到命令模式                                   |
+| dd      | 删除一行                                     |
+| (:wq)   | 保存退出                                     |
+| (:q!)   | 不保存退出                                    |
+| cat     | 查看文件,将文本内容打印到控制台。                        |
+
+```
+# 安装VIM
+sudo apt-get install vim
+# 卸载VIM
+sudo apt-get remove vim
+
+# 更新到最新软件列表
+sudo apt-get update
+```
+
+chmod
+
+- 修改文件权限，eg：chmod a+x xxx.sh chmod 777 xxx.sh
+- 权限设定可以使用字串\[ugoa]\[+-=][rwx]或者数字 (r=4,w=2,x=1,-=0)，
+- u 拥有者
+- g 用户组
+- o 其他用户
+- a 所有人
+- \+ 表示增加权限
+- \- 表示取消权限
+- = 表示直接指定权限 
 
 ## 4. AOSP源码工作环境
 
